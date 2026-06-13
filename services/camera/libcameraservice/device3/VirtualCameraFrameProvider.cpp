@@ -15,6 +15,7 @@
 #include <system/graphics.h>
 #include <ui/GraphicBuffer.h>
 #include <utils/Log.h>
+#include <inttypes.h>
 
 namespace android::camera3::virtualcamera {
 
@@ -197,6 +198,11 @@ status_t fillBuffer(ANativeWindowBuffer* anwBuffer, int fenceFd) {
     if (gb == nullptr) return BAD_VALUE;
 
     void* mapped = nullptr;
+
+    ALOGW("VCAM buffer w=%u h=%u stride=%u format=0x%x usage=0x%" PRIx64,
+          gb->getWidth(), gb->getHeight(), gb->getStride(),
+          gb->getPixelFormat(), gb->getUsage());
+
     status_t res = gb->lockAsync(
             GraphicBuffer::USAGE_SW_WRITE_OFTEN,
             &mapped,
