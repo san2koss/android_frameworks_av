@@ -1,7 +1,8 @@
 #pragma once
 
-#include <android/native_window.h>
 #include <utils/Errors.h>
+
+struct ANativeWindowBuffer;
 
 namespace android::camera3::virtualcamera {
 
