@@ -36,6 +36,8 @@
 #include "Camera3OutputStream.h"
 #include "utils/TraceHFR.h"
 
+#include "VirtualCameraFrameProvider.h"
+
 #ifndef container_of
 #define container_of(ptr, type, member) \
     (type *)((char*)(ptr) - offsetof(type, member))
@@ -469,6 +471,14 @@ status_t Camera3OutputStream::returnBufferCheckedLocked(
 
         nsecs_t captureTime = (mUseReadoutTime && readoutTimestamp != 0 ?
                 readoutTimestamp : timestamp) - mTimestampOffset;
+
+        if (virtualcamera::isEnabled()) {
+            status_t fillRes = virtualcamera::fillBuffer(anwBuffer, anwReleaseFence);
+            if (fillRes == OK) {
+                anwReleaseFence = -1;
+            }
+        }
+
         if (mPreviewFrameSpacer != nullptr) {
             nsecs_t readoutTime = (readoutTimestamp != 0 ? readoutTimestamp : timestamp)
                     - mTimestampOffset;

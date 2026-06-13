@@ -73,6 +73,7 @@ cc_library_shared {
         "device3/Camera3IOStreamBase.cpp",
         "device3/Camera3InputStream.cpp",
         "device3/Camera3OutputStream.cpp",
+        "device3/VirtualCameraFrameProvider.cpp",
         "device3/Camera3FakeStream.cpp",
         "device3/Camera3SharedOutputStream.cpp",
         "device3/StatusTracker.cpp",
