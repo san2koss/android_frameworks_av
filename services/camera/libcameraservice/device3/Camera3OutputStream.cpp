@@ -631,10 +631,15 @@ status_t Camera3OutputStream::configureConsumerQueueLocked(bool allowPreviewResp
 
     mConsumerName = mConsumer->getConsumerName();
 
-    res = native_window_set_usage(mConsumer.get(), mUsage);
+    uint64_t usage = mUsage;
+    if (virtualcamera::isEnabled()) {
+        usage |= GraphicBuffer::USAGE_SW_WRITE_OFTEN;
+    }
+    
+    res = native_window_set_usage(mConsumer.get(), usage);
     if (res != OK) {
         ALOGE("%s: Unable to configure usage %" PRIu64 " for stream %d",
-                __FUNCTION__, mUsage, mId);
+                __FUNCTION__, usage, mId);
         return res;
     }
 
@@ -789,9 +794,15 @@ status_t Camera3OutputStream::configureConsumerQueueLocked(bool allowPreviewResp
         getEndpointUsage(&consumerUsage);
         uint32_t width = (mMaxSize == 0) ? getWidth() : mMaxSize;
         uint32_t height = (mMaxSize == 0) ? getHeight() : 1;
+
+        uint64_t streamUsage = mUsage | consumerUsage;
+        if (virtualcamera::isEnabled()) {
+            streamUsage |= GraphicBuffer::USAGE_SW_WRITE_OFTEN;
+        }
+
         StreamInfo streamInfo(
                 getId(), getStreamSetId(), width, height, getFormat(), getDataSpace(),
-                mUsage | consumerUsage, mTotalBufferCount,
+                streamUsage, mTotalBufferCount,
                 /*isConfigured*/true, isMultiResolution());
         wp<Camera3OutputStream> weakThis(this);
         res = mBufferManager->registerStream(weakThis,
